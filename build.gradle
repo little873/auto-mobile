@@ -1,9 +1,10 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '2.2.21'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '2.2.21' // 👈 添加这行
+    id 'org.jetbrains.kotlin.plugin.serialization' version '2.2.21'
+    id 'application'
 }
 
-group = 'com.gycx'
+group = 'cn.noodlecode'
 version = '1.0-SNAPSHOT'
 
 repositories {
@@ -20,7 +21,6 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
     implementation("io.ktor:ktor-client-logging:$ktor_version")
-//    implementation("io.ktor:ktor-client-sse:$ktor_version")
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
 }
 
@@ -30,4 +30,8 @@ kotlin {
 
 test {
     useJUnitPlatform()
+}
+
+application {
+    mainClass = 'MainKt'
 }

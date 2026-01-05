@@ -32,9 +32,7 @@ class ApiClient(private val modelConfig: ModelConfig) {
     private val jsonHandler = Json { ignoreUnknownKeys = true }
 
     private val client = HttpClient(CIO) {
-        install(ContentNegotiation) {
-            json(jsonHandler)
-        }
+        install(ContentNegotiation) { json(jsonHandler) }
         install(SSE)
     }
 
