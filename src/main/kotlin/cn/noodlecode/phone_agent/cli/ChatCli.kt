@@ -1,6 +1,12 @@
-package cn.noodlecode.phone_agent.model
+package cn.noodlecode.phone_agent.cli
 
 import cn.noodlecode.phone_agent.config.Env
+import cn.noodlecode.phone_agent.model.ApiClient
+import cn.noodlecode.phone_agent.model.ChatCompletionRequest
+import cn.noodlecode.phone_agent.model.Message
+import cn.noodlecode.phone_agent.model.ModelConfig
+import cn.noodlecode.phone_agent.model.TextContent
+import kotlinx.coroutines.flow.collect
 
 class ChatCli(private val modelConfig: ModelConfig? = Env.modelConfig, private val prompts: String? = null) {
 

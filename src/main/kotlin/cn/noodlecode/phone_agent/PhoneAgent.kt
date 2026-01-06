@@ -6,11 +6,11 @@ import cn.noodlecode.phone_agent.device.DeviceControl
 import cn.noodlecode.phone_agent.device.ScreenshotInfo
 import cn.noodlecode.phone_agent.device.adb.AndroidControl
 import cn.noodlecode.phone_agent.model.ActionResult
-import cn.noodlecode.phone_agent.model.Client
 import cn.noodlecode.phone_agent.model.ImageUrl
 import cn.noodlecode.phone_agent.model.ImageUrlContent
 import cn.noodlecode.phone_agent.model.Message
 import cn.noodlecode.phone_agent.model.ModelConfig
+import cn.noodlecode.phone_agent.model.ModelGateway
 import cn.noodlecode.phone_agent.model.TextContent
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.int
@@ -24,7 +24,7 @@ class PhoneAgent(
     deviceId: String? = null,
 ) {
     private val control: DeviceControl = AndroidControl(deviceId)
-    private val client = Client(modelConfig)
+    private val client = ModelGateway(modelConfig)
 
     private var stepCount = 0
     private var messageList = mutableListOf<Message>()
@@ -101,9 +101,7 @@ class PhoneAgent(
             return ActionResult(success = false, finish = false)
         }
 
-        val type: String? = jsonObject["type"]?.jsonPrimitive?.content
-
-        return when (type) {
+        return when (val type: String? = jsonObject["type"]?.jsonPrimitive?.content) {
             "launch" -> {
                 val appName = jsonObject["app"]?.jsonPrimitive?.content ?: ""
                 val packageName = getPackageName(appName)
@@ -111,7 +109,7 @@ class PhoneAgent(
                     ActionResult(control.launch(packageName), false)
                 } else {
                     println("未找到应用包名: $appName")
-                    ActionResult(false, false)
+                    ActionResult(success = false, finish = false)
                 }
             }
 
@@ -154,19 +152,19 @@ class PhoneAgent(
             "wait" -> {
                 val duration = jsonObject["duration"]?.jsonPrimitive?.int ?: 1
                 Thread.sleep(duration * 1000L)
-                ActionResult(true, false)
+                ActionResult(success = true, finish = false)
             }
 
             "note" -> {
                 val message = jsonObject["message"]?.toString() ?: ""
                 println("📝 记录信息: $message")
-                ActionResult(true, false)
+                ActionResult(success = true, finish = false)
             }
 
             "callAPI" -> {
                 val instruction = jsonObject["instruction"]?.jsonPrimitive?.content ?: ""
                 println("🤖 调用分析 API: $instruction")
-                ActionResult(true, false)
+                ActionResult(success = true, finish = false)
             }
 
             "interact", "takeOver" -> {
@@ -174,7 +172,7 @@ class PhoneAgent(
                 println("⚠️ 需要人工干预 ($type): $message")
                 println("请在手机上完成操作后，在此处输入 'ok' 继续...")
                 readlnOrNull()
-                ActionResult(true, false)
+                ActionResult(success = true, finish = false)
             }
 
             "finish" -> {
@@ -185,7 +183,7 @@ class PhoneAgent(
 
             else -> {
                 println("未知操作类型: $type")
-                ActionResult(false, false)
+                ActionResult(success = false, finish = false)
             }
         }
     }

@@ -1,6 +1,6 @@
 package cn.noodlecode.phone_agent.model
 
-class Client(private val modelConfig: ModelConfig) {
+class ModelGateway(private val modelConfig: ModelConfig) {
 
     val apiClient = ApiClient(modelConfig)
 
