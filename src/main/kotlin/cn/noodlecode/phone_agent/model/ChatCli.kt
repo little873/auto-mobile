@@ -2,7 +2,7 @@ package cn.noodlecode.phone_agent.model
 
 import cn.noodlecode.phone_agent.config.Env
 
-class ChatCli(private val modelConfig: ModelConfig? = Env.modelConfig, private val prompts: String? = Env.prompts) {
+class ChatCli(private val modelConfig: ModelConfig? = Env.modelConfig, private val prompts: String? = null) {
 
     val conversation = mutableListOf<Message>()
 
@@ -10,7 +10,7 @@ class ChatCli(private val modelConfig: ModelConfig? = Env.modelConfig, private v
         if (modelConfig == null) return
         if (prompts?.isNotBlank() == true) {
             conversation.add(
-                Message(role = "system", content = listOf(TextContent(Env.prompts)))
+                Message(role = "system", content = listOf(TextContent(prompts)))
             )
         }
         val client = ApiClient(modelConfig)
