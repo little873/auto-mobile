@@ -1,5 +1,7 @@
 package cn.noodlecode.phone_agent.model
 
+import kotlinx.coroutines.flow.Flow
+
 class ModelGateway(private val modelConfig: ModelConfig) {
 
     val apiClient = ApiClient(modelConfig)
@@ -12,18 +14,28 @@ class ModelGateway(private val modelConfig: ModelConfig) {
             messages = messageList,
             temperature = modelConfig.temperature,
             maxTokens = modelConfig.maxToken,
+            stream = false
+        )
+        val response = apiClient.createChatCompletion(request)
+        if (response.isSuccess) {
+            val chatResponse = response.getOrNull()
+            val content = chatResponse?.choices?.firstOrNull()?.message?.content ?: ""
+            return ModelResponse(content)
+        } else {
+            throw Exception("请求失败: ${response.exceptionOrNull()?.message}")
+        }
+    }
+
+    fun requestStream(
+        messageList: List<Message>,
+    ): Flow<String> {
+        val request = ChatCompletionRequest(
+            model = modelConfig.modelName,
+            messages = messageList,
+            temperature = modelConfig.temperature,
+            maxTokens = modelConfig.maxToken,
             stream = true
         )
-        var fullAssistantResponse = ""
-        fullAssistantResponse = StringBuilder().apply {
-            apiClient.createChatCompletionStream(request).collect { chunk ->
-                print(chunk) // 逐字输出
-                append(chunk)
-                // 刷新控制台输出（确保立即显示）
-                System.out.flush()
-            }
-        }.toString()
-        println() // 流结束后换行
-        return ModelResponse(fullAssistantResponse)
+        return apiClient.createChatCompletionStream(request)
     }
 }
